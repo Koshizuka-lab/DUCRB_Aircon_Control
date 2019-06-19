@@ -31,6 +31,7 @@ def searchActiveRoom(bLight:bool):
     req = requests.get(url, auth=(ID, PW))
 
     activeRoom = []
+    controlResult = ""
 
     # 稼働中の部屋情報のみ抽出
     for data in req.json():
@@ -76,6 +77,7 @@ def serachAcitiveVentilationRoom(bLight:bool):
     req = requests.get(url, auth=(ID, PW))
     
     activeRoom = []
+    controlResult = ""
 
     for data in req.json():
         if (data['on_off'] == 1):
