@@ -121,7 +121,7 @@ def searchActiveLightRoom(activeRoom):
             room.find("SVR") != -1 or room.find("EL") != -1 or
             room.find("SMR") != -1):
             continue
-        lightUrl = url + room
+        lightUrl = url + room + "/"
         req = requests.get(lightUrl, auth=(ID, PW))
 
         for data in req.json():
