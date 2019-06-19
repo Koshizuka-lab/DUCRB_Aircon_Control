@@ -22,7 +22,8 @@ PW = data['pw'].decode("utf-8")
 
 SUCCESS_CODE = "204"
 SERVER_ROOM = "B1SVR"
-GALLERY_ROOM = "B106"
+GALLERY_ROOM_1 = "B106"
+GALLERY_ROOM_2 = "B205"
 
 
 def searchActiveRoom(bLight:bool):
@@ -80,8 +81,8 @@ def serachAcitiveVentilationRoom(bLight:bool):
         if (data['on_off'] == 1):
             name = re.sub('\u0000', '', data['name'][3:])
             
-            # サーバ室とB106(ギャラリー室)は調整対象から除外
-            if (name != SERVER_ROOM and name != GALLERY_ROOM):
+            # サーバ室とB106,B205(ギャラリー室)は調整対象から除外
+            if (name != SERVER_ROOM and name != GALLERY_ROOM_1 and name != GALLERY_ROOM_2):
                 activeRoom.append(name)
     
     # 部屋情報の重複削除
