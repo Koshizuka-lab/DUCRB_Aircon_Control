@@ -22,11 +22,14 @@ PW = data['pw'].decode("utf-8")
 
 SUCCESS_CODE = "204"
 SERVER_ROOM = "B1SVR"
+# GALLERY_ROOM: B1~B2Fのギャラリー室
 GALLERY_ROOM_1 = "B106"
 GALLERY_ROOM_2 = "B205"
+# NOT_ELIGIBLE_ROOM: 他研究室から要望のあった調整対象外の部屋
 NOT_ELIGIBLE_ROOM_1 = "B203"
+NOT_ELIGIBLE_ROOM_2 = "A103"
 
-
+# エアコン制御
 def searchActiveRoom(bLight:bool):
     url = BASE_URL + "airconditioner/ALL/"
     req = requests.get(url, auth=(ID, PW))
@@ -44,8 +47,10 @@ def searchActiveRoom(bLight:bool):
             # 廊下の機数番号(1, 2, 3)を除去
             name = re.sub('WAY1|WAY2|WAY3', "WAY", name)
 
-            # B1のサーバ室は対象から除外
-            if (name != SERVER_ROOM and name != NOT_ELIGIBLE_ROOM_1):
+            # B1のサーバ室, A103, B203は対象から除外
+            if (name != SERVER_ROOM 
+            and name != NOT_ELIGIBLE_ROOM_1
+            and name != NOT_ELIGIBLE_ROOM_2):
                 activeRoom.append(name)
 
     # 部屋情報の重複削除
@@ -73,6 +78,7 @@ def searchActiveRoom(bLight:bool):
     # slackへ結果を投稿
     postSlack(str(datetime.datetime.today()) + ": 稼働中エアコン停止処理結果\n" + controlResult)
 
+# 換気扇制御
 def serachAcitiveVentilationRoom(bLight:bool):
     url = BASE_URL + "ventilationunit/ALL/"
     req = requests.get(url, auth=(ID, PW))
@@ -84,9 +90,12 @@ def serachAcitiveVentilationRoom(bLight:bool):
         if (data['on_off'] == 1):
             name = re.sub('\u0000', '', data['name'][3:])
             
-            # サーバ室とB106,B205(ギャラリー室)は調整対象から除外
-            if (name != SERVER_ROOM and name != NOT_ELIGIBLE_ROOM_1 and
-            name != GALLERY_ROOM_1 and name != GALLERY_ROOM_2):
+            # サーバ室, B106,B205(ギャラリー室), A103, B203は調整対象から除外
+            if (name != SERVER_ROOM
+            and name != NOT_ELIGIBLE_ROOM_1
+            and name != NOT_ELIGIBLE_ROOM_2
+            and name != GALLERY_ROOM_1
+            and name != GALLERY_ROOM_2):
                 activeRoom.append(name)
     
     # 部屋情報の重複削除
@@ -121,7 +130,7 @@ def searchActiveLightRoom(activeRoom):
     activeLightRoom = []
     
     for room in activeRoom:
-        # 部屋以外(廊下, エレベータホール, サーバルーム, 電気室)がfind(-1以外)されると　continue実行
+        # 部屋以外(廊下, エレベータホール, サーバルーム, 電気室, 共有機材室)がfind(-1以外)されると　continue実行
         if (room.find("WAY") != -1 or room.find("EVH") != -1 or
             room.find("SVR") != -1 or room.find("EL") != -1 or
             room.find("SMR") != -1):
@@ -155,12 +164,13 @@ def controlMethod (controlActuator, roomName):
     req = requests.put(url, data=json.dumps(putdata), headers=headers, auth=(ID, PW))
     return req.status_code
 
+# 結果をslackへ投稿
 def postSlack(message:str):
-    # slackへ結果を投稿
     slack = slackweb.Slack(url=SLACK_URL)
     slack.notify(text=message)
     
 if __name__ == '__main__':
+    # args: 実行時引数
     args = sys.argv
     if (len(args) == 2):
         if (args[1] == "True"):
