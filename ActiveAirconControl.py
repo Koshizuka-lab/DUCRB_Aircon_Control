@@ -65,15 +65,19 @@ def searchActiveRoom(bLight:bool):
         for lightRoom in activeLightRoom:
             activeRoom.remove(lightRoom)
 
-    # 稼働中の部屋に対してAPI操作実行
-    for room in activeRoom:
-        result = str(controlMethod("airconditioner/", room))
-        if (result == SUCCESS_CODE):
-            result += "(成功)"
-        else:
-            result += "(失敗)"
-        controlResult += (room + ": " + result + "\n")
-        time.sleep(1)
+    # 操作対象が0件だった場合の出力文字追加処理
+    if (len(activeRoom) == 0):
+        controlResult += "操作対象はありませんでした。\n"
+    else:
+        # 稼働中の部屋に対してAPI操作実行
+        for room in activeRoom:
+            result = str(controlMethod("airconditioner/", room))
+            if (result == SUCCESS_CODE):
+                result += "(成功)"
+            else:
+                result += "(失敗)"
+            controlResult += (room + ": " + result + "\n")
+            time.sleep(1)
     
     # slackへ結果を投稿
     postSlack(str(datetime.datetime.today()) + ": 稼働中エアコン停止処理結果\n" + controlResult)
@@ -110,15 +114,20 @@ def serachAcitiveVentilationRoom(bLight:bool):
         for lightRoom in activeLightRoom:
             activeRoom.remove(lightRoom)
 
-    # 稼働中の部屋に対してAPI操作実行
-    for room in activeRoom:
-        result = str(controlMethod("ventilationunit/", room))
-        if (result == SUCCESS_CODE):
-            result += "(成功)"
-        else:
-            result += "(失敗)"
-        controlResult += (room + ": " + result + "\n")
-        time.sleep(1)
+    # 操作対象が0件だった場合の出力文字追加処理
+    if (len(activeRoom) == 0):
+        controlResult += "操作対象はありませんでした。\n"
+    else:
+        # 稼働中の部屋に対してAPI操作実行
+        for room in activeRoom:
+            result = str(controlMethod("ventilationunit/", room))
+            if (result == SUCCESS_CODE):
+                result += "(成功)"
+            else:
+                result += "(失敗)"
+            controlResult += (room + ": " + result + "\n")
+            time.sleep(1)
+    
     
     # slackへ結果を投稿
     postSlack(str(datetime.datetime.today()) + ": 稼働中換気扇停止処理結果\n" + controlResult)
