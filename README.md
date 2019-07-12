@@ -10,5 +10,7 @@ python3 ActiveAirconControl.py False
 
 
 時間指定によりサーバ室の空調を監視し、結果をメールで報告するスクリプト。
-
 python3 ServerRoomMonitoring.py
+
+時間指定によりサーバ室の空調を監視し、空調が停止またはAPIが作動しない場合にSlackで報告するスクリプト。
+python3 ServerRoomMonitoringForSlack.py
