@@ -3,8 +3,8 @@ import json
 import re
 import time
 import datetime
-import smtplib
 import initFile
+import smtplib
 from email.mime.text import MIMEText
 from email.utils import formatdate
 
@@ -111,30 +111,30 @@ def checkAircon():
     data = req.json()[0]
     
     if (int(req.status_code) != 200):
-        postMessage += "空調APIを実行しましたが、情報を取得できませんでした。"
-    elif (int(data["on_off"]) == 1):
+        postMessage += "空調APIを実行しましたが、情報を取得できませんでした。\n"
+        postMessage += "API管理者に稼働状況を確認をしてください。\n"
+        postStatus = "【警告】"
+    else:
         postMessage += convertResultMessage(data)
-    elif (int(data["on_off"]) == 0):
-        postMessage += convertResultMessage(data)
-        postMessage += "\n!!サーバ室の空調が停止しているため、空調の再起動処理を実行します。!!\n\n"
-        resultCode = int(controlMethod("airconditioner/", ROOM))
-        postMessage += "再起動処理結果：" + apiResultCode(resultCode) + "\n"
-        time.sleep(3)
-        postMessage += "===============================\n"
-        postMessage += "再起動処理後 サーバ室空調稼働状況\n"
-        postMessage += "時刻：" + str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")) + "\n\n"
+        if (int(data["on_off"]) == 0):
+            postMessage += "\n!!サーバ室の空調が停止しているため、空調の再起動処理を実行します。!!\n\n"
+            resultCode = int(controlMethod("airconditioner/", ROOM))
+            postMessage += "再起動処理結果：" + apiResultCode(resultCode) + "\n"
+            time.sleep(3)
+            postMessage += "===============================\n"
+            postMessage += "再起動処理後 サーバ室空調稼働状況\n"
+            postMessage += "時刻：" + str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")) + "\n\n"
 
-        req = getAirconStatus()
-        data = req.json()[0]
-        postMessage += convertResultMessage(data)
-        postMessage += "===============================\n"
+            req = getAirconStatus()
+            data = req.json()[0]
+            postMessage += convertResultMessage(data)
+            postMessage += "===============================\n"
 
-    
-    postStatus = checkStatus(int(data["on_off"]), int(data["room_temp"]), int(data["set_temp"]), int(data["fan_speed"]))
+        postStatus = checkStatus(int(data["on_off"]), int(data["room_temp"]), int(data["set_temp"]), int(data["fan_speed"]))
         
     postMessage += "\n\n===========================\n"
     postMessage += "越塚研究室 APIサーバプログラム\n"
-    postMessage += "【警告】の場合は空調がOFFになっています。\n"
+    postMessage += "【警告】の場合は空調がOFF状態、またはAPIの応答がない状態です。\n"
     postMessage += "【注意】の場合は下記のいずれかの状態になっています。\n"
     postMessage += "室内温度が26℃以上、設定温度が21℃以上、風量が急風以外\n"
     postMessage += "===========================\n"
@@ -180,8 +180,8 @@ def sendMail(message, status):
     msg['Date'] = formatdate()
 #     print(msg)
 
-    # 送信先を一つのリストにまとめる(sendmailの仕様)
-    MAIL_LIST = [TO_MAIL_ADD, CC_MAIL_ADD]
+    # 送信先を一つにまとめる(sendmailの仕様)
+    MAIL_LIST = TO_MAIL_ADD.split(',')+CC_MAIL_ADD.split(',')
 
     smtpobj.sendmail(MAIL_ADD, MAIL_LIST, msg.as_string())
     smtpobj.close()
