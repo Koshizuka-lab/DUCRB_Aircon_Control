@@ -103,7 +103,6 @@ def getAirconStatus():
 
 def checkAircon():
     postStatus = ""
-    postMessage = "【試験運用中】\n"
     postMessage += "サーバ室空調稼働状況\n" 
     postMessage += "時刻：" + str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")) + "\n\n"
     
