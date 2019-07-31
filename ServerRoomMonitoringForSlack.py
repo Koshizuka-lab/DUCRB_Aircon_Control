@@ -103,12 +103,13 @@ def checkAircon():
     data = req.json()[0]
     
     postStatus = ""
-    postMessage = "【試験運用中】\n"
-    postMessage += "サーバ室空調稼働状況\n" 
+    postMessage = "サーバ室空調稼働状況\n" 
     postMessage += "時刻：" + str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")) + "\n\n"
 
     if (int(req.status_code) != 200):
-        postMessage += "【注意】サーバ室の空調情報が取得できませんでした。\n"
+        postMessage += "空調APIを実行しましたが、情報を取得できませんでした。\n"
+        postMessage += "API管理者に稼働状況を確認をしてください。\n"
+        postStatus = "【警告】"
     elif (int(data["on_off"]) == 0):
         postMessage += convertResultMessage(data)
         postMessage += "\n!!サーバ室の空調が停止しているため、空調の再起動処理を実行します。!!\n\n"
@@ -123,8 +124,8 @@ def checkAircon():
         data = req.json()[0]
         postMessage += convertResultMessage(data)
         postMessage += "===============================\n"
-        
-        postStatus += checkStatus(int(data["on_off"]), int(data["room_temp"]), int(data["set_temp"]), int(data["fan_speed"])) + "\n"
+
+        postStatus = checkStatus(int(data["on_off"]), int(data["room_temp"]), int(data["set_temp"]), int(data["fan_speed"]))
     else:
         return
     
