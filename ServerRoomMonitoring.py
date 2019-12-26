@@ -23,7 +23,7 @@ MAIL_PW = data['mailPw'].decode("utf-8")
 TO_MAIL_ADD = data['toMailAdd']
 CC_MAIL_ADD = data['ccMailAdd']
 
-SUCCESS_CODE = "204"
+SUCCESS_CODE = 200
 
 ROOM = "b1svr"
 
@@ -109,7 +109,7 @@ def checkAircon():
     req = getAirconStatus()
     data = req.json()[0]
     
-    if (int(req.status_code) != 200):
+    if (int(req.status_code) != SUCCESS_CODE):
         postMessage += "空調APIを実行しましたが、情報を取得できませんでした。\n"
         postMessage += "API管理者に稼働状況を確認をしてください。\n"
         postStatus = "【警告】"
