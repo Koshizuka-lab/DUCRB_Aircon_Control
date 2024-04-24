@@ -21,13 +21,29 @@ ID = data['id'].decode("utf-8")
 PW = data['pw'].decode("utf-8")
 
 SUCCESS_CODE = "204"
-SERVER_ROOM = "B1SVR"
-# GALLERY_ROOM: B1~B2Fのギャラリー室
-GALLERY_ROOM_1 = "B106"
-GALLERY_ROOM_2 = "B205"
-# NOT_ELIGIBLE_ROOM: 他研究室から要望のあった調整対象外の部屋
-NOT_ELIGIBLE_ROOM_1 = "B203"
-NOT_ELIGIBLE_ROOM_2 = "A103"
+
+# 空調制御の対象外の部屋
+EXCLUDE_ROOMS_AIRCONDITIONER = [
+    # サーバールーム
+    "B1SVR",
+    "B1SMR",
+    # 他研究室から要望のあった調整対象外の部屋
+    "B203",
+    "A103"
+]
+
+# 換気扇制御の対象外の部屋
+EXCLUDE_ROOMS_VENTILATION = [
+    # サーバールーム
+    "B1SVR",
+    "B1SMR",
+    # GALLERY_ROOM: B1~B2Fのギャラリー室
+    "B106",
+    "B205",
+    # 他研究室から要望のあった調整対象外の部屋
+    "B203",
+    "A103"
+]
 
 # エアコン制御
 def searchActiveRoom(bLight:bool):
@@ -47,10 +63,8 @@ def searchActiveRoom(bLight:bool):
             # 廊下の機数番号(1, 2, 3)を除去
             name = re.sub('WAY1|WAY2|WAY3', "WAY", name)
 
-            # B1のサーバ室, A103, B203は対象から除外
-            if (name != SERVER_ROOM 
-            and name != NOT_ELIGIBLE_ROOM_1
-            and name != NOT_ELIGIBLE_ROOM_2):
+            # 対象外の部屋の場合何もしない
+            if(name not in EXCLUDE_ROOMS_AIRCONDITIONER):
                 activeRoom.append(name)
 
     # 部屋情報の重複削除
@@ -94,14 +108,10 @@ def serachAcitiveVentilationRoom(bLight:bool):
         if (data['on_off'] == 1):
             name = re.sub('\u0000', '', data['name'][3:])
             
-            # サーバ室, B106,B205(ギャラリー室), A103, B203は調整対象から除外
-            if (name != SERVER_ROOM
-            and name != NOT_ELIGIBLE_ROOM_1
-            and name != NOT_ELIGIBLE_ROOM_2
-            and name != GALLERY_ROOM_1
-            and name != GALLERY_ROOM_2):
+            # 対象外の部屋の場合何もしない
+            if(name not in EXCLUDE_ROOMS_VENTILATION):
                 activeRoom.append(name)
-    
+                
     # 部屋情報の重複削除
     activeRoom = sorted(list(set(activeRoom)), key=activeRoom.index)
 
