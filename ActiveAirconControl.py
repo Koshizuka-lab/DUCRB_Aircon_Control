@@ -80,7 +80,7 @@ def searchActiveRoom(bLight:bool):
             time.sleep(1)
     
     # slackへ結果を投稿
-    postSlack(str(datetime.datetime.today()) + ": 稼働中エアコン停止処理結果\n" + controlResult)
+    postSlack(str(datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S")) + ": 稼働中エアコン停止処理結果\n" + controlResult)
 
 # 換気扇制御
 def serachAcitiveVentilationRoom(bLight:bool):
@@ -130,7 +130,7 @@ def serachAcitiveVentilationRoom(bLight:bool):
     
     
     # slackへ結果を投稿
-    postSlack(str(datetime.datetime.today()) + ": 稼働中換気扇停止処理結果\n" + controlResult)
+    postSlack(str(datetime.datetime.today().strftime("%Y/%m/%d %H:%M:%S")) + ": 稼働中換気扇停止処理結果\n" + controlResult)
 
 
 # 照明が付いている部屋の配列を返す

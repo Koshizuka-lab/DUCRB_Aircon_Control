@@ -20,7 +20,7 @@ SLACK_URL = data['serverRoomSlack']
 ID = data['id'].decode("utf-8")
 PW = data['pw'].decode("utf-8")
 
-SUCCESS_CODE = "204"
+SUCCESS_CODE = 200
 
 ROOM = "b1svr"
 
@@ -106,7 +106,7 @@ def checkAircon():
     postMessage = "サーバ室空調稼働状況\n" 
     postMessage += "時刻：" + str(datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")) + "\n\n"
 
-    if (int(req.status_code) != 200):
+    if (int(req.status_code) != SUCCESS_CODE):
         postMessage += "空調APIを実行しましたが、情報を取得できませんでした。\n"
         postMessage += "API管理者に稼働状況を確認をしてください。\n"
         postStatus = "【警告】"
